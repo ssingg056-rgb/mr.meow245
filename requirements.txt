@@ -1,0 +1,8 @@
+discord.py
+aiohttp
+motor
+pymongo
+openai
+python-dotenv
+flask
+requests 
