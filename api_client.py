@@ -139,3 +139,9 @@ class APIClient:
                 raise NetworkError("Request timeout after retries")
 
         raise NetworkError(f"Failed after {MAX_RETRIES} attempts: {last_exception}")
+
+# Create a global instance so main.py can import the function directly
+_default_client = APIClient()
+
+async def chat_completion(messages: list[dict[str, str]], system_prompt: str, max_tokens: int = 300) -> str:
+    return await _default_client.chat_completion(messages, system_prompt, max_tokens)
