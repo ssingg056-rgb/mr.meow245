@@ -56,7 +56,7 @@ class MrMeowBot(commands.Bot):
 
     async def setup_hook(self):
         if MONGO_URI:
-            self.db = Database(MONGO_URI)
+            self.db = Database()
             await self.db.connect()
             self.history = HistoryManager(self.db.db)
             self.economy_config = EconomyConfig(self.db.db)
