@@ -48,7 +48,8 @@ INTENTS.message_content = True
 
 class MrMeowBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="?", intents=INTENTS, help_command=None)
+        # Changed prefix from "?" to "-" here:
+        super().__init__(command_prefix="-", intents=INTENTS, help_command=None)
         self.db: Database | None = None
         self.history: HistoryManager | None = None
         self.economy_config: EconomyConfig | None = None
@@ -126,7 +127,8 @@ class MrMeowBot(commands.Bot):
             is_reply_to_bot = message.reference.resolved.author == self.user
 
         if 'mr.meow' in msg_lower or is_reply_to_bot:
-            if msg_lower.startswith('?'):
+            # Updated to ignore messages starting with the new prefix "-"
+            if msg_lower.startswith('-'):
                 return
 
             if not self.history:
@@ -159,7 +161,7 @@ class MrMeowBot(commands.Bot):
                 reply_text = await chat_completion(
                     api_messages,
                     api_key=OPENROUTER_API_KEY,
-                    model="mistralai/mistral-7b-instruct:free",
+                    model="openrouter/free",
                     max_tokens=300,
                 )
                 await self.history.append_message(guild_id, message.channel.id, message.author.id, "assistant", reply_text)
@@ -179,7 +181,7 @@ class MrMeowBot(commands.Bot):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send("❌ You don't have permission to use this command.")
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(f"❌ Missing argument: `{error.param.name}`. Use `?help` for usage.")
+            await ctx.send(f"❌ Missing argument: `{error.param.name}`. Use `-help` for usage.")
         else:
             print(f"Command error: {type(error).__name__} - {error}")
 
