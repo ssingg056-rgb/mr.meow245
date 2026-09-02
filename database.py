@@ -29,7 +29,10 @@ class Database:
 
     async def _create_indexes(self):
         # conversations: unique compound + TTL on updated_at (30 days)
-
+        await self.db.conversations.create_index(
+            [("guild_id", ASCENDING), ("channel_id", ASCENDING), ("user_id", ASCENDING)],
+            unique=True,
+        )
         await self.db.conversations.create_index(
             "updated_at",
             expireAfterSeconds=2592000,
@@ -62,6 +65,9 @@ class Database:
             [("guild_id", ASCENDING), ("name", ASCENDING)],
             unique=True,
         )
+
+        # guild_configs: _id = guild_id (natural key)
+        await self.db.guild_configs.create_index("_id", unique=True)
 
     def get_collection(self, name: str):
         if self.db is None:

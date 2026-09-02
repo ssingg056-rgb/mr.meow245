@@ -15,13 +15,12 @@ class EconomyCog(commands.Cog):
             return
         if ALLOWED_GUILD_IDS and (message.guild is None or message.guild.id not in ALLOWED_GUILD_IDS):
             return
-        # Updated to check for the new "-" prefix and alternate bot triggers
-        if message.content.startswith(("-", "?", "mr.", "Mr.")):
+        if message.content.startswith(("?", "mr.", "Mr.")):
             return
         if hasattr(self.bot, "economy") and self.bot.economy:
             await self.bot.economy.message_reward(message.guild.id, message.author.id)
 
-    @commands.command(name="balance", aliases=["bal"])
+    @commands.command(name="balance")
     async def balance(self, ctx):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
@@ -139,39 +138,41 @@ class EconomyCog(commands.Cog):
         emoji = "✅" if success else "❌"
         await ctx.send(f"{emoji} {msg}")
 
-    @commands.command(name="quote", aliases=["q"])
-    async def quote(self, ctx, message_id: int = None):
-        """Greed Bot style quote command: turns a message into an aesthetic quote embed."""
+    @commands.command(name="fish")
+    async def fish(self, ctx):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
+        success, msg, new_bal = await self.bot.economy.fish(ctx.guild.id, ctx.author.id)
+        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        emoji = "🎣" if success else "⏰"
+        reply = f"{emoji} {msg}"
+        if success:
+            reply += f" | New balance: `{new_bal}` {symbol}"
+        await ctx.send(reply)
 
-        target_message = None
-        if message_id:
-            try:
-                target_message = await ctx.channel.fetch_message(message_id)
-            except Exception:
-                await ctx.send("❌ Could not find a message with that ID in this channel.")
-                return
-        elif ctx.message.reference and ctx.message.reference.resolved:
-            target_message = ctx.message.reference.resolved
-        else:
-            await ctx.send("❌ Please reply to a message or provide a message ID to quote! Usage: `-quote [message_id]`")
+    @commands.command(name="hunt")
+    async def hunt(self, ctx):
+        if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
+        success, msg, new_bal = await self.bot.economy.hunt(ctx.guild.id, ctx.author.id)
+        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        emoji = "🏹" if success else "⏰"
+        reply = f"{emoji} {msg}"
+        if success:
+            reply += f" | New balance: `{new_bal}` {symbol}"
+        await ctx.send(reply)
 
-        embed = discord.Embed(
-            description=f"\"{target_message.content}\"",
-            color=EMBED_COLOR,
-            timestamp=target_message.created_at
-        )
-        embed.set_author(name=target_message.author.display_name, icon_url=target_message.author.display_avatar.url)
-        embed.set_footer(text=f"Quote requested by {ctx.author.display_name}")
-        
-        await ctx.send(embed=embed)
-        # Clean up the user's invocation command message if possible
-        try:
-            await ctx.message.delete()
-        except Exception:
-            pass
+    @commands.command(name="mine")
+    async def mine(self, ctx):
+        if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
+            return
+        success, msg, new_bal = await self.bot.economy.mine(ctx.guild.id, ctx.author.id)
+        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        emoji = "⛏️" if success else "⏰"
+        reply = f"{emoji} {msg}"
+        if success:
+            reply += f" | New balance: `{new_bal}` {symbol}"
+        await ctx.send(reply)
 
     @commands.command(name="addshopitem")
     @commands.has_permissions(manage_guild=True)

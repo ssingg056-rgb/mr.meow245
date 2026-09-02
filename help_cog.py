@@ -61,7 +61,7 @@ class HelpCog(commands.Cog):
             embed.add_field(name="`?help`", value="Shows this help menu.", inline=False)
 
         elif category == "economy":
-            embed.description = "**Economy commands:**" 
+            embed.description = "**Economy commands:**"
             embed.add_field(name="`?balance`", value="Check your current coin balance.", inline=False)
             embed.add_field(name="`?daily`", value="Claim your daily coins (24h cooldown).", inline=False)
             embed.add_field(name="`?weekly`", value="Claim your weekly coins (7d cooldown).", inline=False)
@@ -70,6 +70,9 @@ class HelpCog(commands.Cog):
             embed.add_field(name="`?leaderboard [page]`", value="Top 10 richest users. Page defaults to 1.", inline=False)
             embed.add_field(name="`?shop`", value="Browse the server shop.", inline=False)
             embed.add_field(name="`?buy <item> [qty]`", value="Purchase an item from the shop.", inline=False)
+            embed.add_field(name="`?fish`", value="Go fishing for coins.", inline=False)
+            embed.add_field(name="`?hunt`", value="Hunt for treasure.", inline=False)
+            embed.add_field(name="`?mine`", value="Mine for resources.", inline=False)
 
         elif category == "owner":
             embed.description = "**Owner-only commands:**"
