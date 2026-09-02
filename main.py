@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Any
 import motor.motor_asyncio
 import discord
 from discord.ext import commands
@@ -7,7 +8,6 @@ from dotenv import load_dotenv
 from flask import Flask
 from threading import Thread
 import requests
-from economy.config import EconomyConfig
 
 from constants import (
     ALLOWED_GUILD_IDS,
@@ -52,9 +52,7 @@ class MrMeowBot(commands.Bot):
         super().__init__(command_prefix="?", intents=INTENTS, help_command=None)
         self.db: Database | None = None
         self.history: HistoryManager | None = None
-        # EconomyConfig is exposed as a module by the economy package, so it
-        # cannot be used directly as a type annotation here.
-        self.economy_config = None
+        self.economy_config: Any | None = None
         self.economy: EconomyManager | None = None
 
     async def setup_hook(self):
@@ -162,7 +160,7 @@ class MrMeowBot(commands.Bot):
                 reply_text = await chat_completion(
                     api_messages,
                     api_key=OPENROUTER_API_KEY,
-                    model="mistralai/mistral-7b-instruct:free",
+                    model="openrouter/free",
                     max_tokens=300,
                 )
                 await self.history.append_message(guild_id, message.channel.id, message.author.id, "assistant", reply_text)

@@ -299,6 +299,48 @@ class EconomyManager:
         await self._log_transaction(guild_id, None, user_id, amount, "admin_take", f"Admin take")
         return True, f"Took {amount} from user {user_id}", new_balance
 
+    async def _perform_activity(self, guild_id: int, user_id: int, activity: str, reward_min: int, reward_max: int, cooldown_seconds: int, txn_type: str) -> tuple[bool, str, Optional[int]]:
+        """
+        Generic helper for activity commands like fish, hunt, mine.
+        Returns (success, message, new_balance) where new_balance is None if on cooldown.
+        """
+        # Ensure user exists
+        await self._ensure_user(guild_id, user_id)
+        now = datetime.utcnow()
+        field_name = f"last_{activity}"
+        user = await self.users.find_one({"guild_id": guild_id, "user_id": user_id})
+        last_time = user.get(field_name)
+        if last_time and now - last_time < timedelta(seconds=cooldown_seconds):
+            next_time = last_time + timedelta(seconds=cooldown_seconds)
+            remaining = next_time - now
+            minutes = int(remaining.total_seconds() // 60)
+            seconds = int(remaining.total_seconds() % 60)
+            return False, f"{activity.title()} is on cooldown. Try again in {minutes}m {seconds}s.", None
+        amount = random.randint(reward_min, reward_max)
+        result = await self.users.find_one_and_update(
+            {"guild_id": guild_id, "user_id": user_id},
+            {
+                "$inc": {"balance": amount, "total_earned": max(0, amount)},
+                "$set": {field_name: now},
+            },
+            return_document=ReturnDocument.AFTER,
+        )
+        new_balance = result.get("balance", 0) if result else 0
+        await self._log_transaction(guild_id, None, user_id, amount, txn_type, f"{activity.title()} reward")
+        return True, f"You {activity}ed and earned {amount}!", new_balance
+
+    async def fish(self, guild_id: int, user_id: int) -> tuple[bool, str, Optional[int]]:
+        # Fish reward: 15-50 coins, 30 min cooldown
+        return await self._perform_activity(guild_id, user_id, "fish", 15, 50, 30 * 60, "fish_reward")
+
+    async def hunt(self, guild_id: int, user_id: int) -> tuple[bool, str, Optional[int]]:
+        # Hunt reward: 25-75 coins, 45 min cooldown
+        return await self._perform_activity(guild_id, user_id, "hunt", 25, 75, 45 * 60, "hunt_reward")
+
+    async def mine(self, guild_id: int, user_id: int) -> tuple[bool, str, Optional[int]]:
+        # Mine reward: 30-100 coins, 60 min cooldown
+        return await self._perform_activity(guild_id, user_id, "mine", 30, 100, 60 * 60, "mine_reward")
+
     async def _log_transaction(
         self,
         guild_id: int,
