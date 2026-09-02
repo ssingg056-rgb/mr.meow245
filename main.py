@@ -52,7 +52,9 @@ class MrMeowBot(commands.Bot):
         super().__init__(command_prefix="?", intents=INTENTS, help_command=None)
         self.db: Database | None = None
         self.history: HistoryManager | None = None
-        self.economy_config: EconomyConfig | None = None
+        # EconomyConfig is exposed as a module by the economy package, so it
+        # cannot be used directly as a type annotation here.
+        self.economy_config = None
         self.economy: EconomyManager | None = None
 
     async def setup_hook(self):

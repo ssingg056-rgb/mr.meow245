@@ -25,7 +25,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         bal = await self.bot.economy.get_balance(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         await ctx.send(f"**{ctx.author.display_name}**'s balance: `{bal}` {symbol}")
 
     @commands.command(name="daily")
@@ -33,7 +33,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         success, msg, new_bal = await self.bot.economy.claim_daily(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "✅" if success else "⏰"
         reply = f"{emoji} {msg}"
         if success:
@@ -45,7 +45,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         success, msg, new_bal = await self.bot.economy.claim_weekly(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "✅" if success else "⏰"
         reply = f"{emoji} {msg}"
         if success:
@@ -60,7 +60,7 @@ class EconomyCog(commands.Cog):
             await ctx.send("Amount must be positive!")
             return
         success, msg = await self.bot.economy.transfer(ctx.guild.id, ctx.author.id, member.id, amount)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "💸" if success else "❌"
         await ctx.send(f"{emoji} {msg} {symbol}")
 
@@ -72,7 +72,7 @@ class EconomyCog(commands.Cog):
             await ctx.send("Amount must be positive!")
             return
         success, msg, new_bal = await self.bot.economy.gamble(ctx.guild.id, ctx.author.id, amount)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "🎉" if success else "💸"
         await ctx.send(f"{emoji} {msg} | Balance: `{new_bal}` {symbol}")
 
@@ -81,7 +81,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         entries = await self.bot.economy.get_leaderboard(ctx.guild.id, max(page, 1))
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         if not entries:
             await ctx.send("No one has coins yet!")
             return
@@ -105,7 +105,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         items = await self.bot.economy.get_shop(ctx.guild.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         if not items:
             await ctx.send("The shop is empty!")
             return
@@ -143,7 +143,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         success, msg, new_bal = await self.bot.economy.fish(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "🎣" if success else "⏰"
         reply = f"{emoji} {msg}"
         if success:
@@ -155,7 +155,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         success, msg, new_bal = await self.bot.economy.hunt(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "🏹" if success else "⏰"
         reply = f"{emoji} {msg}"
         if success:
@@ -167,7 +167,7 @@ class EconomyCog(commands.Cog):
         if ALLOWED_GUILD_IDS and ctx.guild.id not in ALLOWED_GUILD_IDS:
             return
         success, msg, new_bal = await self.bot.economy.mine(ctx.guild.id, ctx.author.id)
-        symbol = (await self.bot.economy.config.get_currency_info(ctx.guild.id))["symbol"]
+        _, symbol = await self.bot.economy.config.get_currency_info(ctx.guild.id)
         emoji = "⛏️" if success else "⏰"
         reply = f"{emoji} {msg}"
         if success:
